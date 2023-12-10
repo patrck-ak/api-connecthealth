@@ -1,4 +1,4 @@
 # api-connecthealth
 
 | instalação de dependências
--> `npm install`
+- `npm install`
