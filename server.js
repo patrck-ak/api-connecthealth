@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const { access } = require("fs");
 const User = require("./models/User");
-// var cors = require("cors");
+var cors = require("cors");
 
 const secret = process.env.SECRET
 
