@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const { access } = require("fs");
 const User = require("./models/User");
-// var cors = require("cors");
+var cors = require("cors");
 
 const secret = process.env.SECRET
 
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
 // config express
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 
 //* logar usuário
