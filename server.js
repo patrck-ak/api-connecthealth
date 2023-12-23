@@ -15,9 +15,11 @@ const secret = process.env.SECRET
 const app = express();
 const port = 5000;
 const corsOptions = {
-  origin: "52.41.36.82:5000",
-  credentials: true,
-};
+  "origin": "*",
+  "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+  "preflightContinue": false,
+  "optionsSuccessStatus": 204
+}
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
