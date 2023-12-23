@@ -14,10 +14,10 @@ const secret = process.env.SECRET
 
 const app = express();
 const port = 5000;
-// const corsOptions = {
-//   origin: "http://clientside-connect-med.vercel.app/",
-//   credentials: true,
-// };
+const corsOptions = {
+  origin: "52.41.36.82:5000",
+  credentials: true,
+};
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
