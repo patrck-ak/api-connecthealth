@@ -14,6 +14,11 @@ const secret = process.env.SECRET
 
 const app = express();
 const port = 5000;
+const corsOptions = {
+  origin: "http://clientside-connect-med.vercel.app/",
+  credentials: true,
+};
+
 // config express
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
