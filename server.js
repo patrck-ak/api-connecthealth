@@ -8,21 +8,21 @@ const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const { access } = require("fs");
 const User = require("./models/User");
-var cors = require("cors");
+// var cors = require("cors");
 
 const secret = process.env.SECRET
 
 const app = express();
 const port = 5000;
-const corsOptions = {
-  origin: "http://clientside-connect-med.vercel.app/",
-  credentials: true,
-};
+// const corsOptions = {
+//   origin: "http://clientside-connect-med.vercel.app/",
+//   credentials: true,
+// };
 
 // config express
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
