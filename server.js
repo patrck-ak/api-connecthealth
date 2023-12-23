@@ -10,12 +10,12 @@ const { access } = require("fs");
 const User = require("./models/User");
 var cors = require("cors");
 
-const secret = '9DS0AD7ADA7DY028DASUDAS09DA8D9A8'
+const secret = process.env.SECRET
 
 const app = express();
 const port = 5000;
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: "https://clientside-connect-med.vercel.app/",
   credentials: true,
 };
 
