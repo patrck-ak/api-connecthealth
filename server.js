@@ -14,15 +14,15 @@ const secret = process.env.SECRET
 
 const app = express();
 const port = 5000;
-// const corsOptions = {
-//   origin: "http://clientside-connect-med.vercel.app/",
-//   credentials: true,
-// };
+const corsOptions = {
+  origin: "http://clientside-connect-med.vercel.app/",
+  credentials: true,
+};
 
 // config express
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -42,17 +42,17 @@ app.post("/auth/user", async (req, res, next) => {
   console.log(name, pass)
 
   if (!name) {
-    return res.json({ err: "ID em branco ou inválida.", status: 1 })
+    return res.json({ err: "ID em branco ou inválida.", status: 1 }).header('Access-Control-Allow-Origin', '*')
   }
   if (!pass) {
-    return res.json({ err: "Senha em branco ou inválida.", status: 2  });
+    return res.json({ err: "Senha em branco ou inválida.", status: 2  }).header('Access-Control-Allow-Origin', '*');
   }
 
   //* busca o usuario no banco
   const user = await User.findOne({ name: name });
   //! caso não exista retorna json de erro
   if (!user) {
-    return res.json({ err: "Usuário não encontrado.", status: 3  });
+    return res.json({ err: "Usuário não encontrado.", status: 3  }).header('Access-Control-Allow-Origin', '*');
   }
 
   //* compara o input de senha com o hash do banco
@@ -61,7 +61,7 @@ app.post("/auth/user", async (req, res, next) => {
 
 
   if (!checkPassword) {
-    return res.json({ err: "Senha incorreta.", status: 4  });
+    return res.json({ err: "Senha incorreta.", status: 4  }).header('Access-Control-Allow-Origin', '*');
   } else {
     const secret = process.env.SECRET
     const token = jwt.sign({id: user._id}, secret)
@@ -83,16 +83,16 @@ app.post("/user/new/admin", async (req, res) => {
   const { name, pass, email, level } = req.body;
 
   if (!name) {
-    return res.json({ err: "UserID em branco ou inválido." });
+    return res.json({ err: "UserID em branco ou inválido." }).header('Access-Control-Allow-Origin', '*');
   }
   if (!pass) {
-    return res.json({ err: "Senha em branco ou inválido." });
+    return res.json({ err: "Senha em branco ou inválido." }).header('Access-Control-Allow-Origin', '*');
   }
   if (!email) {
-    return res.json({ err: "E-mail em branco ou inválido." });
+    return res.json({ err: "E-mail em branco ou inválido." }).header('Access-Control-Allow-Origin', '*');
   }
   if (!level) {
-    return res.json({ err: "Nivel de permissão em branco ou inválido." });
+    return res.json({ err: "Nivel de permissão em branco ou inválido." }).header('Access-Control-Allow-Origin', '*');
   }
 
   //* verifica se usuario já existe
@@ -100,10 +100,10 @@ app.post("/user/new/admin", async (req, res) => {
   const mailExists = await User.findOne({ email: email });
 
   if (userExists) {
-    return res.json({ err: "Usuário já cadastrado" });
+    return res.json({ err: "Usuário já cadastrado" }).header('Access-Control-Allow-Origin', '*');
   }
   if (mailExists) {
-    return res.json({ msg: "E-mail já cadastrado" });
+    return res.json({ msg: "E-mail já cadastrado" }).header('Access-Control-Allow-Origin', '*');
   }
 
   //* criptar senha DB
@@ -121,7 +121,7 @@ app.post("/user/new/admin", async (req, res) => {
   //* cria um usuário
   try {
     await user.save();
-    res.status(201).json({ msg: "usuario criado com sucesso." });
+    res.status(201).json({ msg: "usuario criado com sucesso." }).header('Access-Control-Allow-Origin', '*');
   } catch (error) {
     // retorna erro caso tenha algum
     console.log(error);
