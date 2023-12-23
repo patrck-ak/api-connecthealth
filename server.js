@@ -24,6 +24,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
 
+app.get('/', async (req, res) => {
+  res.json({msg: 'Olá :)'})
+})
+
 //* logar usuário
 app.post("/auth/user", async (req, res, next) => {
   const { name, pass } = req.body;
