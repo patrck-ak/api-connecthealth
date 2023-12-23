@@ -27,6 +27,8 @@ app.use(cors(corsOptions));
 //* logar usuário
 app.post("/auth/user", async (req, res, next) => {
   const { name, pass } = req.body;
+  var level;
+  console.log(name, pass)
 
   if (!name) {
     return res.json({ err: "ID em branco ou inválida.", status: 1 })
@@ -45,12 +47,22 @@ app.post("/auth/user", async (req, res, next) => {
   //* compara o input de senha com o hash do banco
   const checkPassword = await bcrypt.compare(pass, user.password);
   console.log(checkPassword, pass);
+
+
   if (!checkPassword) {
     return res.json({ err: "Senha incorreta.", status: 4  });
   } else {
     const secret = process.env.SECRET
     const token = jwt.sign({id: user._id}, secret)
-    return res.send({ name: user.name, status: 5, id: user.id, token: token});
+    switch(user.level) {
+      case 0:
+        level = 3121; // nivel 0 leitura
+      case 1: 
+        level = 2431; // nivel de leitura e escrita
+      case 2:
+        level = 1261 // nivel de leitura, escrita e remoção
+    }
+    return res.send({ name: user.name, status: 5, id: user.id, token: token, level: level});
   }
 });
 
@@ -58,6 +70,7 @@ app.post("/auth/user", async (req, res, next) => {
 app.post("/user/new/admin", async (req, res) => {
   // recupera todos os inputs
   const { name, pass, email, level } = req.body;
+
   if (!name) {
     return res.json({ err: "UserID em branco ou inválido." });
   }
