@@ -30,10 +30,10 @@ app.use((req, res, next) => {
 });
 
 
-app.get('/', async (req, res) => {
-  res.json({msg: 'Olá :)'})
-})
 
+app.get('/auth/user', () => {
+  res.json({msg: 'olá'})
+})
 
 //* logar usuário
 app.post("/auth/user", async (req, res, next) => {
