@@ -36,7 +36,7 @@ app.post("/validation", async (req, res) => {
   const { tk, id } = req.body;
   var tokenValid = false;
   try {
-    //* logger de tentavida de token inválido.
+    //* log de tentavida de token inválido.
     tokenValid = jwt.verify(tk, secret);
   } catch (error) {
     console.error("token inválido: " + tk);
@@ -154,10 +154,12 @@ app.post("/user/new/admin", async (req, res) => {
   }
 });
 
+
 //* editar usuário admin
-app.get('/user/edit/', async (req, res) => {
-  const { name } = req.body;
-  const user = await User.findOne({name: name})
+app.post('/user/edit/', async (req, res) => {
+  const { nam } = req.body;
+  const user = await User.findOne({name: nam})
+  console.log(nam)
   if (!user) {
     return res.json({err: 'Usuário não encontrado.'})
   } else {
