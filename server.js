@@ -49,7 +49,6 @@ app.post("/validation", async (req, res) => {
   }
 });
 
-
 //* logar usuário
 app.post("/auth/user", async (req, res) => {
   const { name, pass } = req.body;
@@ -150,61 +149,54 @@ app.post("/user/new/admin", async (req, res) => {
   } catch (error) {
     // retorna erro caso tenha algum
     console.log(error);
-
   }
 });
 
-
 //* editar usuário admin
-app.post('/user/edit/', async (req, res) => {
-  const { nam } = req.body;
-  const user = await User.findOne({name: nam})
-  console.log(nam)
-  if (!user) {
-    return res.json({err: 'Usuário não encontrado.'})
-  } else {
-    return res.json({user})
-  }
-
-})
-
+app.get("/user/edit/", async (request, res) => {
+  const { nam, id, token } = await request.body;
+  const user = await User.findOne({ _id: id });
+  console.log(token);
+  return res.json({ user });
+});
 
 //*
-app.post('/pacients/create', async (req, res) => {
+app.post("/pacients/create", async (req, res) => {
   // desestrutura todos os inputs da requisição
   const { nam, email, address, desc, cpf, pass, admin, idadmin } = req.body;
-  if(!nam) {
-    return res.json({msg: 'Nome do paciente inválido.'})
-  } if(!email) {
-    return res.json({msg: 'E-Mail de paciente inválido.'})
-  } if(!address) {
-    return res.json({msg: 'Endereço do paciente inválido.'})
-  } if(!desc) {
-    return res.json({msg: 'Descrição do paciente não pode estar em branco.'})
-  } if(!cpf) {
-    return res.json({msg: 'CPF do paciente inválido.'})
+  if (!nam) {
+    return res.json({ msg: "Nome do paciente inválido." });
+  }
+  if (!email) {
+    return res.json({ msg: "E-Mail de paciente inválido." });
+  }
+  if (!address) {
+    return res.json({ msg: "Endereço do paciente inválido." });
+  }
+  if (!desc) {
+    return res.json({ msg: "Descrição do paciente não pode estar em branco." });
+  }
+  if (!cpf) {
+    return res.json({ msg: "CPF do paciente inválido." });
   }
 
-  const adm = await User.findOne({name: admin})
-  var pacientExists = await Pacient.findOne({name: nam})
-  var hash = adm.password
+  const adm = await User.findOne({ name: admin });
+  var pacientExists = await Pacient.findOne({ name: nam });
+  var hash = adm.password;
 
   // verifica se já existe algum paciente cadastrado
-  if(pacientExists) {
-    return res.json({err: 'Nome já registrado.'})
+  if (pacientExists) {
+    return res.json({ err: "Nome já registrado." });
   }
 
-  if(bcrypt.compare(pass, hash)) {
-    console.log('senha válida')
-    return res.json({msg: 'true'})
+  if (bcrypt.compare(pass, hash)) {
+    console.log("senha válida");
+    return res.json({ msg: "true" });
   } else {
-    console.log('senha invalida')
-    return res.json({msg: 'false'})
+    console.log("senha invalida");
+    return res.json({ msg: "false" });
   }
-}
-)
-
-
+});
 
 //! .ENV
 const dbUser = process.env.DB_USER;
