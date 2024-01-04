@@ -168,6 +168,7 @@ app.post("/pacients/create", async (req, res) => {
   if (!email) {
     return res.json({ err: "E-Mail de paciente inválido.", status: 2 });
   }
+  console.log(address)
   if (!address) {
     return res.json({ err: "Endereço do paciente inválido.", status: 3 });
   }
@@ -189,7 +190,7 @@ app.post("/pacients/create", async (req, res) => {
 
   if (bcrypt.compare(pass, hash)) {
     console.log("senha válida");
-    return res.json({ msg: "true" });
+    return res.json({ msg: "Paciente criado.", status: 10 });
   } else {
     console.log("senha invalida");
     return res.json({ err: "Senha inválida.", status: 7 });
