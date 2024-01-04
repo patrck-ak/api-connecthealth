@@ -102,7 +102,6 @@ app.post("/user/new/admin", async (req, res) => {
   if (adminLevel !== "1261") {
     return res.json({ err: "Seu usuário não tem permissão.", status: 10 });
   }
-
   if (!name) {
     return res.json({ err: "UserID em branco ou inválido.", status: 1 });
   }
@@ -153,31 +152,30 @@ app.post("/user/new/admin", async (req, res) => {
 });
 
 //* editar usuário admin
-app.get("/user/edit/", async (request, res) => {
-  const { nam, id, token } = await request.body;
-  const user = await User.findOne({ _id: id });
-  console.log(token);
-  return res.json({ user });
-});
+app.post('/user/edit', async (req, res) => {
+  const {name, id, token, auth} = req.body;
+  const user = await User.findOne({_id: id})
+  return res.json({user: user})
+}) 
 
 //*
 app.post("/pacients/create", async (req, res) => {
   // desestrutura todos os inputs da requisição
   const { nam, email, address, desc, cpf, pass, admin, idadmin } = req.body;
   if (!nam) {
-    return res.json({ msg: "Nome do paciente inválido." });
+    return res.json({ err: "Nome do paciente inválido.", status: 1 });
   }
   if (!email) {
-    return res.json({ msg: "E-Mail de paciente inválido." });
+    return res.json({ err: "E-Mail de paciente inválido.", status: 2 });
   }
   if (!address) {
-    return res.json({ msg: "Endereço do paciente inválido." });
+    return res.json({ err: "Endereço do paciente inválido.", status: 3 });
   }
   if (!desc) {
-    return res.json({ msg: "Descrição do paciente não pode estar em branco." });
+    return res.json({ err: "Descrição do paciente não pode estar em branco.", status: 4 });
   }
   if (!cpf) {
-    return res.json({ msg: "CPF do paciente inválido." });
+    return res.json({ err: "CPF do paciente inválido.", status: 5 });
   }
 
   const adm = await User.findOne({ name: admin });
@@ -186,7 +184,7 @@ app.post("/pacients/create", async (req, res) => {
 
   // verifica se já existe algum paciente cadastrado
   if (pacientExists) {
-    return res.json({ err: "Nome já registrado." });
+    return res.json({ err: "Nome já registrado.", status: 6 });
   }
 
   if (bcrypt.compare(pass, hash)) {
@@ -194,7 +192,7 @@ app.post("/pacients/create", async (req, res) => {
     return res.json({ msg: "true" });
   } else {
     console.log("senha invalida");
-    return res.json({ msg: "false" });
+    return res.json({ err: "Senha inválida.", status: 7 });
   }
 });
 
@@ -207,7 +205,7 @@ mongoose
   .connect(`mongodb+srv://${dbUser}:${dbPass}@cluster0.zausybw.mongodb.net/`)
   .then(
     app.listen(port, () => {
-      console.log("Banco conectado!\n" + "API na porta " + port);
+      console.log('rodando...');
     })
   )
   .catch((err) => {
