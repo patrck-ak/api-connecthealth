@@ -4,10 +4,10 @@ const Pacient = mongoose.model('Pacient', {
   name: String,
   email: String,
   password: String,
-  level: Number,
-  cpf: Number,
+  cpf: String,
   addr: String,
-  desc: String
+  desc: String,
+  atend: String,
 })
 
 module.exports = Pacient

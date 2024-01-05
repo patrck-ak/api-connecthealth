@@ -56,24 +56,24 @@ app.post("/auth/user", async (req, res) => {
   console.log(name, pass);
 
   if (!name) {
-    return res.json({ err: "ID em branco ou inválida.", status: 1 });
+    return res.json({ msg: "ID em branco ou inválida.", title: "ERRO", status: 5 });
   }
   if (!pass) {
-    return res.json({ err: "Senha em branco ou inválida.", status: 2 });
+    return res.json({ msg: "Senha em branco ou inválida.", title: "ERRO", status: 5 });
   }
 
   //* busca o usuario no banco
   const user = await User.findOne({ name: name });
   //! caso não exista retorna json de erro
   if (!user) {
-    return res.json({ err: "Usuário não encontrado.", status: 3 });
+    return res.json({ msg: "Usuário não encontrado.", title: "ERRO", status: 5 });
   }
 
   //* compara o input de senha com o hash do banco
   const checkPassword = await bcrypt.compare(pass, user.password);
 
   if (!checkPassword) {
-    return res.json({ err: "Senha incorreta.", status: 4 });
+    return res.json({ msg: "Senha incorreta.", title: "ERRO", status: 5 });
   } else {
     const secret = process.env.SECRET;
     const token = jwt.sign({ id: user._id }, secret);
@@ -100,22 +100,19 @@ app.post("/user/new/admin", async (req, res) => {
   // recupera todos os inputs
   const { name, pass, email, level, adminLevel } = req.body;
   if (adminLevel !== "1261") {
-    return res.json({ err: "Seu usuário não tem permissão.", status: 10 });
+    return res.json({ msg: "Seu usuário não tem permissão.", title: "ERRO", status: 5 });
   }
   if (!name) {
-    return res.json({ err: "UserID em branco ou inválido.", status: 1 });
+    return res.json({ msg: "UserID em branco ou inválido.", title: "ERRO", status: 5 });
   }
   if (!pass) {
-    return res.json({ err: "Senha em branco ou inválido.", status: 2 });
+    return res.json({ msg: "Senha em branco ou inválido.", title: "ERRO", status: 5 });
   }
   if (!email) {
-    return res.json({ err: "E-mail em branco ou inválido.", status: 3 });
+    return res.json({ msg: "E-mail em branco ou inválido.", title: "ERRO", status: 5 });
   }
   if (!level) {
-    return res.json({
-      err: "Nivel de permissão em branco ou inválido.",
-      status: 4,
-    });
+    return res.json({ msg: "Nivel de permissão em branco ou inválido.", status: 5, });
   }
 
   //* verifica se usuario já existe
@@ -123,10 +120,10 @@ app.post("/user/new/admin", async (req, res) => {
   const mailExists = await User.findOne({ email: email });
 
   if (userExists) {
-    return res.json({ err: "Usuário já cadastrado", status: 5 });
+    return res.json({ msg: "Usuário já cadastrado", title: "ERRO",status: 5 });
   }
   if (mailExists) {
-    return res.json({ msg: "E-mail já cadastrado", status: 6 });
+    return res.json({ msg: "E-mail já cadastrado", title: "ERRO", status: 5 });
   }
 
   //* criptar senha
@@ -144,7 +141,7 @@ app.post("/user/new/admin", async (req, res) => {
   //* envia o usuário
   try {
     await user.save();
-    res.status(201).json({ msg: "usuario criado com sucesso.", status: 200 });
+    res.status(201).json({ msg: "Usuario criado com sucesso.", title: "SUCESSO" , status: 10 });
   } catch (error) {
     // retorna erro caso tenha algum
     console.log(error);
@@ -159,41 +156,54 @@ app.post('/user/edit', async (req, res) => {
 }) 
 
 //*
+//! PAREI AQUI FAZENDO O TITULO DO TOAST
 app.post("/pacients/create", async (req, res) => {
   // desestrutura todos os inputs da requisição
   const { nam, email, address, desc, cpf, pass, admin, idadmin } = req.body;
   if (!nam) {
-    return res.json({ err: "Nome do paciente inválido.", status: 1 });
+    return res.json({ msg: "Nome do paciente inválido.", title: 'ERRO', status: 5 });
   }
   if (!email) {
-    return res.json({ err: "E-Mail de paciente inválido.", status: 2 });
+    return res.json({ msg: "E-Mail de paciente inválido.", title: 'ERRO', status: 5 });
   }
   console.log(address)
+  if (!cpf) {
+    return res.json({ msg: "CPF do paciente inválido.", title: 'ERRO', status: 5 });
+  }
   if (!address) {
-    return res.json({ err: "Endereço do paciente inválido.", status: 3 });
+    return res.json({ msg: "Endereço do paciente inválido.", title: 'ERRO', status: 5 });
   }
   if (!desc) {
-    return res.json({ err: "Descrição do paciente não pode estar em branco.", status: 4 });
-  }
-  if (!cpf) {
-    return res.json({ err: "CPF do paciente inválido.", status: 5 });
+    return res.json({ msg: "Descrição do paciente não pode estar em branco.", title: 'ERRO', status: 5});
   }
 
   const adm = await User.findOne({ name: admin });
-  var pacientExists = await Pacient.findOne({ name: nam });
+
   var hash = adm.password;
+  // inicializa a lista de pacientes
+  var atend = '0'
 
-  // verifica se já existe algum paciente cadastrado
-  if (pacientExists) {
-    return res.json({ err: "Nome já registrado.", status: 6 });
-  }
-
-  if (bcrypt.compare(pass, hash)) {
+  if (await bcrypt.compare(pass, hash)) {
     console.log("senha válida");
-    return res.json({ msg: "Paciente criado.", status: 10 });
+    try {
+      const pacient = new Pacient({
+        nam,
+        email,
+        cpf,
+        addr: address,
+        desc,
+        atend,
+      });
+
+      pacient.save()
+      return res.json({ msg: `Paciente criado com sucesso.`, title: 'SUCESSO', status: 10 });
+    } catch (error) {
+      console.log(error)
+      return res.json({ msg: 'Erro interno, por favor contate o Suporte.', title: "ERRO", status: 5})
+    }
   } else {
     console.log("senha invalida");
-    return res.json({ err: "Senha inválida.", status: 7 });
+    return res.json({ msg: "Senha inválida.", title: 'ERRO', status: 5 });
   }
 });
 
