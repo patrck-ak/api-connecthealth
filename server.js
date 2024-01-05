@@ -207,6 +207,11 @@ app.post("/pacients/create", async (req, res) => {
   }
 });
 
+app.post('/log/medic', async (req, res) => {
+  const { msg, err, id, date} = req.body
+  console.log(msg, err, id, date)
+});
+
 //! .ENV
 const dbUser = process.env.DB_USER;
 const dbPass = process.env.DB_PASS;
