@@ -285,7 +285,7 @@ app.post("/checkcpf", async (req, res) => {
   if(!p) {
     return res.json({msg: "CPF não encontrado.", title: "ERRO", status: 5})
   } else {
-    return res.json({msg: "Usuário encontrado, você será redirecionado.", title: "SUCESSO", status: 10})
+    return res.json({msg: `Usuário encontrado: ${p.name}`, title: "SUCESSO", status: 10})
   }
 });
 
