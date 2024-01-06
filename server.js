@@ -289,7 +289,7 @@ app.post("/checkcpf", async (req, res) => {
   }
 });
 
-app.post('/awake', async (req) => {
+app.post('/awake', async (req, res) => {
   const { awake} = req.body;
   if (awake === 'awake') {
     return res.json({msg: 'true'})
