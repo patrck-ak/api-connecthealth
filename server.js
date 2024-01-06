@@ -281,11 +281,11 @@ app.post("/log/medic", async (req, res) => {
 
 app.post("/checkcpf", async (req, res) => {
   const { cpf } = req.body;
-  const p = Pacient.findOne({cpf: cpf})
+  const p = await Pacient.findOne({cpf: cpf})
   if(!p) {
     return res.json({msg: "CPF não encontrado.", title: "ERRO", status: 5})
   } else {
-    return res.jsoN({msg: "Usuário encontrado, você será redirecionado.", title: "SUCESSO", status: 10})
+    return res.json({msg: "Usuário encontrado, você será redirecionado.", title: "SUCESSO", status: 10})
   }
 });
 
