@@ -7,7 +7,7 @@ const Pacient = mongoose.model('Pacient', {
   cpf: String,
   addr: String,
   desc: String,
-  atend: String,
+  atend: Array,
 })
 
 module.exports = Pacient

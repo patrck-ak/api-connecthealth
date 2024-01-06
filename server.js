@@ -85,9 +85,12 @@ app.post("/auth/user", async (req, res) => {
       case 2:
         level = 1261; // nivel de leitura, escrita e remoção
     }
-    return res.send({
+    return res.json({
+      msg: "Sessão validada.",
+      title: "SUCESSO",
+      auth: true,
       name: user.name,
-      status: 5,
+      status: 10,
       id: user.id,
       token: token,
       level: level,
@@ -103,13 +106,13 @@ app.post("/user/new/admin", async (req, res) => {
     return res.json({ msg: "Seu usuário não tem permissão.", title: "ERRO", status: 5 });
   }
   if (!name) {
-    return res.json({ msg: "UserID em branco ou inválido.", title: "ERRO", status: 5 });
-  }
-  if (!pass) {
-    return res.json({ msg: "Senha em branco ou inválido.", title: "ERRO", status: 5 });
+    return res.json({ msg: "ID em branco ou inválido.", title: "ERRO", status: 5 });
   }
   if (!email) {
     return res.json({ msg: "E-mail em branco ou inválido.", title: "ERRO", status: 5 });
+  }
+  if (!pass) {
+    return res.json({ msg: "Senha em branco ou inválido.", title: "ERRO", status: 5 });
   }
   if (!level) {
     return res.json({ msg: "Nivel de permissão em branco ou inválido.", status: 5, });
@@ -166,7 +169,6 @@ app.post("/pacients/create", async (req, res) => {
   if (!email) {
     return res.json({ msg: "E-Mail de paciente inválido.", title: 'ERRO', status: 5 });
   }
-  console.log(address)
   if (!cpf) {
     return res.json({ msg: "CPF do paciente inválido.", title: 'ERRO', status: 5 });
   }
@@ -181,13 +183,13 @@ app.post("/pacients/create", async (req, res) => {
 
   var hash = adm.password;
   // inicializa a lista de pacientes
-  var atend = '0'
+  var atend = []
 
   if (await bcrypt.compare(pass, hash)) {
     console.log("senha válida");
     try {
       const pacient = new Pacient({
-        nam,
+        name: nam,
         email,
         cpf,
         addr: address,
