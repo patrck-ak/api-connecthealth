@@ -289,6 +289,14 @@ app.post("/checkcpf", async (req, res) => {
   }
 });
 
+app.post('/awake', async (req, res) => {
+  const { awake} = req.body;
+  if (awake === 'awake') {
+    return res.json({msg: 'true'})
+  }
+})
+
+
 //! .ENV
 const dbUser = process.env.DB_USER;
 const dbPass = process.env.DB_PASS;
