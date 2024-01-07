@@ -1,4 +1,4 @@
-// importação do .env
+//* importação do .env
 require("dotenv").config();
 
 const express = require("express");
@@ -31,15 +31,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
 
-//* validação de usuário via token
+// validação de usuário via token
 app.post("/validation", async (req, res) => {
   const { tk, id } = req.body;
   var tokenValid = false;
   try {
-    //* log de tentavida de token inválido.
+    // log de tentavida de token inválido.
     tokenValid = jwt.verify(tk, secret);
   } catch (error) {
-    console.error("token inválido: " + tk);
   }
   const userExists = User.findOne({ _id: id });
   if (tokenValid && userExists) {
@@ -49,11 +48,10 @@ app.post("/validation", async (req, res) => {
   }
 });
 
-//* logar usuário
+// logar usuário
 app.post("/auth/user", async (req, res) => {
   const { name, pass } = req.body;
   var level;
-  console.log(name, pass);
 
   if (!name) {
     return res.json({
@@ -70,9 +68,8 @@ app.post("/auth/user", async (req, res) => {
     });
   }
 
-  //* busca o usuario no banco
+  // busca o usuario no banco
   const user = await User.findOne({ name: name });
-  //! caso não exista retorna json de erro
   if (!user) {
     return res.json({
       msg: "Usuário não encontrado.",
@@ -81,7 +78,7 @@ app.post("/auth/user", async (req, res) => {
     });
   }
 
-  //* compara o input de senha com o hash do banco
+  // compara o input de senha com o hash do banco
   const checkPassword = await bcrypt.compare(pass, user.password);
 
   if (!checkPassword) {
@@ -110,7 +107,7 @@ app.post("/auth/user", async (req, res) => {
   }
 });
 
-//* cadastrar usuario admin
+//* cadastrar médico
 app.post("/user/new/admin", async (req, res) => {
   // recupera todos os inputs
   const { name, pass, email, level, adminLevel } = req.body;
@@ -149,7 +146,7 @@ app.post("/user/new/admin", async (req, res) => {
     });
   }
 
-  //* verifica se usuario já existe
+  // verifica se usuario já existe
   const userExists = await User.findOne({ name: name });
   const mailExists = await User.findOne({ email: email });
 
@@ -160,11 +157,11 @@ app.post("/user/new/admin", async (req, res) => {
     return res.json({ msg: "E-mail já cadastrado", title: "ERRO", status: 5 });
   }
 
-  //* criptar senha
+  // criptar senha
   const salt = await bcrypt.genSalt(12);
   const passwordHash = await bcrypt.hash(pass, salt);
 
-  //* salvar usuário na tabela
+  // salvar usuário na tabela
   const user = new User({
     name,
     email,
@@ -172,16 +169,14 @@ app.post("/user/new/admin", async (req, res) => {
     level,
   });
 
-  //* envia o usuário
+  // envia o usuário
   try {
     await user.save();
-    res
-      .status(201)
-      .json({
-        msg: "Usuario criado com sucesso.",
-        title: "SUCESSO",
-        status: 10,
-      });
+    res.status(201).json({
+      msg: "Usuario criado com sucesso.",
+      title: "SUCESSO",
+      status: 10,
+    });
   } catch (error) {
     // retorna erro caso tenha algum
     console.log(error);
@@ -195,8 +190,7 @@ app.post("/user/edit", async (req, res) => {
   return res.json({ user: user });
 });
 
-//*
-//! PAREI AQUI FAZENDO O TITULO DO TOAST
+//* criação de novo paciente
 app.post("/pacients/create", async (req, res) => {
   // desestrutura todos os inputs da requisição
   const { nam, email, address, desc, cpf, pass, admin, idadmin } = req.body;
@@ -237,13 +231,12 @@ app.post("/pacients/create", async (req, res) => {
   }
 
   const adm = await User.findOne({ name: admin });
-
   var hash = adm.password;
+  
   // inicializa a lista de pacientes
   var atend = [];
 
   if (await bcrypt.compare(pass, hash)) {
-    console.log("senha válida");
     try {
       const pacient = new Pacient({
         name: nam,
@@ -269,32 +262,63 @@ app.post("/pacients/create", async (req, res) => {
       });
     }
   } else {
-    console.log("senha invalida");
     return res.json({ msg: "Senha inválida.", title: "ERRO", status: 5 });
   }
 });
 
+//* sistema de log
 app.post("/log/medic", async (req, res) => {
   const { msg, err, id, date } = req.body;
   console.log(msg, err, id, date);
 });
 
+//* busca de registros de consultas
 app.post("/checkcpf", async (req, res) => {
   const { cpf } = req.body;
-  const p = await Pacient.findOne({cpf: cpf})
-  if(!p) {
-    return res.json({msg: "CPF não encontrado.", title: "ERRO", status: 5})
+  const p = await Pacient.findOne({ cpf: cpf });
+  if (!p) {
+    return res.json({ msg: "CPF não encontrado.", title: "ERRO", status: 5 });
   } else {
-    return res.json({msg: "Usuário encontrado.", title: "SUCESSO", status: 10})
-  }});
+    return res.json({
+      msg: "Usuário encontrado.",
+      title: "SUCESSO",
+      status: 10,
+    });
+  }
+});
 
-app.post('/awake', async (req, res) => {
-  const { awake} = req.body;
-  if (awake === 'awake') {
-    return res.json({msg: 'true'})
+//* listar todos pacientes cadastrados  
+app.post("/dashboard/listpacients", async (req, res) => {
+  const {token, id} = req.body;
+  var tokenValid = false;
+
+  const user = await User.findOne({_id: id})
+  if(!user) {
+    return res.json({msg: 'Usuário não existe.', title: "ERRO", status: 5})
+  }
+
+  // validação de token
+  try {
+    tokenValid = jwt.verify(token, secret);
+  } catch (error) {
+    return res.json({msg: 'Erro interno.', title: "ERRO", status: 5})
+  }
+
+  try {
+    const pacients = await Pacient.find()
+    return res.json({pacients, status: 10})
+  } catch (error) {
+    
   }
 })
 
+// sistema de awakeup para render
+app.post("/awake", async (req, res) => {
+  const { awake } = req.body;
+  if (awake === "awake") {
+    return res.json({ msg: "true" });
+  }
+});
 
 //! .ENV
 const dbUser = process.env.DB_USER;
