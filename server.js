@@ -291,12 +291,10 @@ app.post("/checkcpf", async (req, res) => {
 app.post("/dashboard/listpacients", async (req, res) => {
   const {token, id} = req.body;
   var tokenValid = false;
-  console.log('1')
   const user = await User.findOne({_id: id})
   if(!user) {
     return res.json({msg: 'Usuário não existe.', title: "ERRO", status: 5})
   }
-  console.log('2')
 
   // validação de token
   try {
@@ -304,11 +302,9 @@ app.post("/dashboard/listpacients", async (req, res) => {
   } catch (error) {
     return res.json({msg: 'Erro interno.', title: "ERRO", status: 5})
   }
-  console.log('3')
 
   try {
     const pacients = await Pacient.find()
-    console.log('5')
     return res.json({pacients, status: 10})
   } catch (error) {
     
