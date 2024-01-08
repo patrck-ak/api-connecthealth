@@ -308,11 +308,11 @@ app.post("/dashboard/listpacients", async (req, res) => {
 
   try {
     const pacients = await Pacient.find()
+    console.log('5')
     return res.json({pacients, status: 10})
   } catch (error) {
     
   }
-  console.log('5')
 
 })
 
