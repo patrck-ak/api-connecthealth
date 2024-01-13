@@ -38,8 +38,7 @@ app.post("/validation", async (req, res) => {
   try {
     // log de tentavida de token inválido.
     tokenValid = jwt.verify(tk, secret);
-  } catch (error) {
-  }
+  } catch (error) {}
   const userExists = User.findOne({ _id: id });
   if (tokenValid && userExists) {
     res.json({ stts: true });
@@ -232,7 +231,7 @@ app.post("/pacients/create", async (req, res) => {
 
   const adm = await User.findOne({ name: admin });
   var hash = adm.password;
-  
+
   // inicializa a lista de pacientes
   var atend = [];
 
@@ -287,30 +286,45 @@ app.post("/checkcpf", async (req, res) => {
   }
 });
 
-//* listar todos pacientes cadastrados  
+//* listar todos pacientes cadastrados
 app.post("/dashboard/listpacients", async (req, res) => {
-  const {token, id} = req.body;
+  const { token, id } = req.body;
   var tokenValid = false;
-  const user = await User.findOne({_id: id})
-  if(!user) {
-    return res.json({msg: 'Usuário não existe.', title: "ERRO", status: 5})
+  const user = await User.findOne({ _id: id });
+  if (!user) {
+    return res.json({ msg: "Usuário não existe.", title: "ERRO", status: 5 });
   }
 
   // validação de token
   try {
     tokenValid = jwt.verify(token, secret);
   } catch (error) {
-    return res.json({msg: 'Erro interno.', title: "ERRO", status: 5})
+    return res.json({ msg: "Erro interno.", title: "ERRO", status: 5 });
   }
 
   try {
-    const pacients = await Pacient.find()
-    return res.json({pacients, status: 10})
-  } catch (error) {
-    
-  }
+    const pacients = await Pacient.find();
+    return res.json({ pacients, status: 10 });
+  } catch (error) {}
+});
 
-})
+// rota de delete de paciente
+app.post("/pacients/edit/delete", async (req, res) => {
+  const { token, id, idmedic } = req.body;
+  const pacient = await Pacient.findOneAndDelete({ _id: id });
+  if (!pacient) {
+    return res.json({
+      msg: `Este id [${id}] não existe no banco, tente reiniciar a página!`,
+      title: "ERRO",
+      status: 5,
+    });
+  }
+  return res.json({
+    msg: `Usuário [${id}] apagado com sucesso!`,
+    title: "SUCESSO",
+    status: 10,
+  });
+});
 
 // sistema de awakeup para render
 app.post("/awake", async (req, res) => {
