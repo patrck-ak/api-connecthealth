@@ -31,7 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
 
-// validação de usuário via token
+//? validação de usuário via token
 app.post("/validation", async (req, res) => {
   const { tk, id } = req.body;
   var tokenValid = false;
@@ -47,7 +47,7 @@ app.post("/validation", async (req, res) => {
   }
 });
 
-// logar usuário
+//? logar usuário
 app.post("/auth/user", async (req, res) => {
   const { name, pass } = req.body;
   var level;
@@ -55,14 +55,14 @@ app.post("/auth/user", async (req, res) => {
   if (!name) {
     return res.json({
       msg: "ID em branco ou inválida.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
   if (!pass) {
     return res.json({
       msg: "Senha em branco ou inválida.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
@@ -72,7 +72,7 @@ app.post("/auth/user", async (req, res) => {
   if (!user) {
     return res.json({
       msg: "Usuário não encontrado.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
@@ -81,7 +81,7 @@ app.post("/auth/user", async (req, res) => {
   const checkPassword = await bcrypt.compare(pass, user.password);
 
   if (!checkPassword) {
-    return res.json({ msg: "Senha incorreta.", title: "ERRO", status: 5 });
+    return res.json({ msg: "Senha incorreta.", type: "error", status: 5 });
   } else {
     const secret = process.env.SECRET;
     const token = jwt.sign({ id: user._id }, secret);
@@ -95,7 +95,7 @@ app.post("/auth/user", async (req, res) => {
     }
     return res.json({
       msg: "Sessão validada.",
-      title: "SUCESSO",
+      type: "success",
       auth: true,
       name: user.name,
       status: 10,
@@ -106,35 +106,35 @@ app.post("/auth/user", async (req, res) => {
   }
 });
 
-//* cadastrar médico
+//? cadastrar médico
 app.post("/user/new/admin", async (req, res) => {
   // recupera todos os inputs
   const { name, pass, email, level, adminLevel } = req.body;
   if (adminLevel !== "1261") {
     return res.json({
       msg: "Seu usuário não tem permissão.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
   if (!name) {
     return res.json({
       msg: "ID em branco ou inválido.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
   if (!email) {
     return res.json({
       msg: "E-mail em branco ou inválido.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
   if (!pass) {
     return res.json({
       msg: "Senha em branco ou inválido.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
@@ -150,10 +150,10 @@ app.post("/user/new/admin", async (req, res) => {
   const mailExists = await User.findOne({ email: email });
 
   if (userExists) {
-    return res.json({ msg: "Usuário já cadastrado", title: "ERRO", status: 5 });
+    return res.json({ msg: "Usuário já cadastrado", type: "error", status: 5 });
   }
   if (mailExists) {
-    return res.json({ msg: "E-mail já cadastrado", title: "ERRO", status: 5 });
+    return res.json({ msg: "E-mail já cadastrado", type: "error", status: 5 });
   }
 
   // criptar senha
@@ -173,7 +173,7 @@ app.post("/user/new/admin", async (req, res) => {
     await user.save();
     res.status(201).json({
       msg: "Usuario criado com sucesso.",
-      title: "SUCESSO",
+      type: "success",
       status: 10,
     });
   } catch (error) {
@@ -182,49 +182,49 @@ app.post("/user/new/admin", async (req, res) => {
   }
 });
 
-//* editar usuário admin
+//? editar usuário admin
 app.post("/user/edit", async (req, res) => {
   const { name, id, token, auth } = req.body;
   const user = await User.findOne({ _id: id });
   return res.json({ user: user });
 });
 
-//* criação de novo paciente
+//? criação de novo paciente
 app.post("/pacients/create", async (req, res) => {
   // desestrutura todos os inputs da requisição
   const { nam, email, address, desc, cpf, pass, admin, idadmin } = req.body;
   if (!nam) {
     return res.json({
       msg: "Nome do paciente inválido.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
   if (!email) {
     return res.json({
       msg: "E-Mail de paciente inválido.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
   if (!cpf) {
     return res.json({
       msg: "CPF do paciente inválido.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
   if (!address) {
     return res.json({
       msg: "Endereço do paciente inválido.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
   if (!desc) {
     return res.json({
       msg: "Descrição do paciente não pode estar em branco.",
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
@@ -248,58 +248,58 @@ app.post("/pacients/create", async (req, res) => {
 
       pacient.save();
       return res.json({
-        msg: `Paciente criado com sucesso.`,
-        title: "SUCESSO",
+        msg: "Paciente criado com sucesso.",
+        type: "success",
         status: 10,
       });
     } catch (error) {
       console.log(error);
       return res.json({
         msg: "Erro interno, por favor contate o Suporte.",
-        title: "ERRO",
+        type: "error",
         status: 5,
       });
     }
   } else {
-    return res.json({ msg: "Senha inválida.", title: "ERRO", status: 5 });
+    return res.json({ msg: "Senha inválida.", type: "error", status: 5 });
   }
 });
 
-//* sistema de log
+//? sistema de log
 app.post("/log/medic", async (req, res) => {
   const { msg, err, id, date } = req.body;
   console.log(msg, err, id, date);
 });
 
-//* busca de registros de consultas
+//? busca de registros de consultas
 app.post("/checkcpf", async (req, res) => {
   const { cpf } = req.body;
   const p = await Pacient.findOne({ cpf: cpf });
   if (!p) {
-    return res.json({ msg: "CPF não encontrado.", title: "ERRO", status: 5 });
+    return res.json({ msg: "CPF não encontrado.", type: "error", status: 5 });
   } else {
     return res.json({
       msg: "Usuário encontrado.",
-      title: "SUCESSO",
+      type: "success",
       status: 10,
     });
   }
 });
 
-//* listar todos pacientes cadastrados
+//? listar todos pacientes cadastrados
 app.post("/dashboard/listpacients", async (req, res) => {
   const { token, id } = req.body;
   var tokenValid = false;
   const user = await User.findOne({ _id: id });
   if (!user) {
-    return res.json({ msg: "Usuário não existe.", title: "ERRO", status: 5 });
+    return res.json({ msg: "Usuário não existe.", type: "error", status: 5 });
   }
 
   // validação de token
   try {
     tokenValid = jwt.verify(token, secret);
   } catch (error) {
-    return res.json({ msg: "Erro interno.", title: "ERRO", status: 5 });
+    return res.json({ msg: "Erro interno.", type: "error", status: 5 });
   }
 
   try {
@@ -308,29 +308,42 @@ app.post("/dashboard/listpacients", async (req, res) => {
   } catch (error) {}
 });
 
-// rota de delete de paciente
+//? apagando paciente
 app.post("/pacients/edit/delete", async (req, res) => {
   const { token, id, idmedic } = req.body;
+
+  const secret = process.env.SECRET;
+  const isValidToken = jwt.verify(token, secret);
+
   const pacient = await Pacient.findOneAndDelete({ _id: id });
   if (!pacient) {
     return res.json({
       msg: `Este id [${id}] não existe no banco, tente reiniciar a página!`,
-      title: "ERRO",
+      type: "error",
       status: 5,
     });
   }
   return res.json({
     msg: `Usuário [${id}] apagado com sucesso!`,
-    title: "SUCESSO",
+    type: "success",
     status: 10,
   });
 });
 
-// sistema de awakeup para render
-app.post("/awake", async (req, res) => {
-  const { awake } = req.body;
-  if (awake === "awake") {
-    return res.json({ msg: "true" });
+//? dados de paciente especifico
+app.post("/getpacient", async (req, res) => {
+  const { id } = req.body;
+  try {
+    const pacient = await Pacient.findOne({ _id: id });
+    if (!pacient || pacient === undefined) {
+      console.log("erro" + pacient);
+      return res.json({ msg: "Paciente não encontrado.", status: 5 });
+    } else {
+      return res.json({ pacient, status: 10 });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.json({ msg: "Paciente não encontrado.", status: 5 });
   }
 });
 
@@ -338,7 +351,7 @@ app.post("/awake", async (req, res) => {
 const dbUser = process.env.DB_USER;
 const dbPass = process.env.DB_PASS;
 
-//* Conexão a DB (dados no .env)
+//? Conexão a DB (dados no .env)
 mongoose
   .connect(`mongodb+srv://${dbUser}:${dbPass}@cluster0.zausybw.mongodb.net/`)
   .then(
