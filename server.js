@@ -347,6 +347,10 @@ app.post("/getpacient", async (req, res) => {
   }
 });
 
+app.patch("/update/pacient", async (req, res) => {
+  return res.json({ msg: "ok", status: 10 });
+});
+
 //! .ENV
 const dbUser = process.env.DB_USER;
 const dbPass = process.env.DB_PASS;
