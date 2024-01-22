@@ -18,6 +18,7 @@ const corsOptions = {
   origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: false,
+
   optionsSuccessStatus: 204,
 };
 
@@ -288,11 +289,17 @@ app.post("/checkcpf", async (req, res) => {
 
 //? listar todos pacientes cadastrados
 app.post("/dashboard/listpacients", async (req, res) => {
-  const { token, id } = req.body;
+  const { token, id, pacientName } = req.body;
   var tokenValid = false;
+
+  // verifica se o id do médico é valido
   const user = await User.findOne({ _id: id });
   if (!user) {
-    return res.json({ msg: "Usuário não existe.", type: "error", status: 5 });
+    return res.json({
+      msg: "ID do médico não existe.",
+      type: "error",
+      status: 5,
+    });
   }
 
   // validação de token
@@ -303,8 +310,15 @@ app.post("/dashboard/listpacients", async (req, res) => {
   }
 
   try {
-    const pacients = await Pacient.find();
-    return res.json({ pacients, status: 10 });
+    if (pacientName === undefined || pacientName === "") {
+      const pacients = await Pacient.find();
+      return res.json({ pacients, status: 10 });
+    } else {
+      const pacients = await Pacient.find({
+        name: { $regex: `${pacientName}`, $options: "i" },
+      });
+      return res.json({ pacients, status: 10 });
+    }
   } catch (error) {}
 });
 
@@ -313,21 +327,30 @@ app.post("/pacients/edit/delete", async (req, res) => {
   const { token, id, idmedic } = req.body;
 
   const secret = process.env.SECRET;
-  const isValidToken = jwt.verify(token, secret);
-
-  const pacient = await Pacient.findOneAndDelete({ _id: id });
-  if (!pacient) {
+  try {
+    const isValidToken = jwt.verify(token, secret);
+    if (isValidToken) {
+      const pacient = await Pacient.findOneAndDelete({ _id: id });
+      if (!pacient) {
+        return res.json({
+          msg: `Este id [${id}] não existe no banco, tente reiniciar a página!`,
+          type: "error",
+          status: 5,
+        });
+      }
+      return res.json({
+        msg: `Usuário [${id}] apagado com sucesso!`,
+        type: "success",
+        status: 10,
+      });
+    }
+  } catch (error) {
     return res.json({
-      msg: `Este id [${id}] não existe no banco, tente reiniciar a página!`,
+      msg: "Erro interno da aplicação.",
       type: "error",
       status: 5,
     });
   }
-  return res.json({
-    msg: `Usuário [${id}] apagado com sucesso!`,
-    type: "success",
-    status: 10,
-  });
 });
 
 //? dados de paciente especifico
