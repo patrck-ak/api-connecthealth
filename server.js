@@ -371,6 +371,23 @@ app.post("/getpacient", async (req, res) => {
 });
 
 app.patch("/update/pacient", async (req, res) => {
+  const { name, cpf, desc, id, email, addr, medicid, medictoken } = req.body;
+  const update = {
+    id: id,
+    email: email,
+    medicid: medicid,
+    medictoken: medictoken,
+    name: name,
+    cpf: cpf,
+    desc: desc,
+    addr: addr,
+  };
+  console.log(update);
+
+  // try {
+  //   const p = Pacient.findOneAndUpdate();
+  // } catch (error) {}
+
   return res.json({ msg: "ok", status: 10 });
 });
 
