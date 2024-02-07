@@ -375,20 +375,21 @@ app.patch("/update/pacient", async (req, res) => {
   const update = {
     id: id,
     email: email,
-    medicid: medicid,
-    medictoken: medictoken,
     name: name,
     cpf: cpf,
     desc: desc,
     addr: addr,
   };
+
   console.log(update);
-
-  // try {
-  //   const p = Pacient.findOneAndUpdate();
-  // } catch (error) {}
-
-  return res.json({ msg: "ok", status: 10 });
+  try {
+    const p = await Pacient.findOneAndUpdate({ _id: id }, update);
+    console.log(p);
+    return res.json({ msg: "ok", status: 10 });
+  } catch (error) {
+    console.log(error);
+    return res.json({ msg: "error", status: 5 });
+  }
 });
 
 //! .ENV
